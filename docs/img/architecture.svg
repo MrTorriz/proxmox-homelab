@@ -70,7 +70,7 @@
   <circle cx="419" cy="380" r="3.5" class="green" fill="#4ade80"/>
   <text x="430" y="384" class="small green">always-on</text>
   <text x="100" y="410" class="body">Ubuntu 24.04 · 8 GB cap — the homelab stack</text>
-  <text x="100" y="430" class="body muted">~45 containers: media · photos · DNS · proxy</text>
+  <text x="100" y="430" class="body muted">~40 containers: media · photos · DNS · proxy</text>
   <text x="100" y="450" class="body muted">own Mullvad client, lockdown mode</text>
   <rect x="100" y="470" width="190" height="46" rx="9" fill="#0c1526" stroke="#2b3a5c"/>
   <text x="195" y="489" text-anchor="middle" class="small" style="font-weight:600">RTX 2060</text>

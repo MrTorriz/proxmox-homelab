@@ -10,7 +10,7 @@ The hypervisor runs virtualization and hardware health. Nothing else.
 | Layer | Machine | Responsibility |
 |---|---|---|
 | Hypervisor | `pve` (bare metal) | QEMU/KVM, vzdump backups, SMART monitoring, power metering (RAPL) |
-| Workload | VM 100 (Ubuntu 24.04) | ~45 Docker containers — the entire [homelab stack](https://github.com/MrTorriz/homelab) |
+| Workload | VM 100 (Ubuntu 24.04) | ~40 Docker containers — the entire [homelab stack](https://github.com/MrTorriz/homelab) |
 | VPN edge | VM 105 (Alpine) | WireGuard gateway with fail-closed killswitch for the lab VMs |
 | Lab | VMs 101–104 | Windows 11, Kali, NixOS, Arch — on demand, never always-on |
 
@@ -64,8 +64,8 @@ storage wants to own (wipe) its disks and wants 3+ nodes; on a single 16 GB host
 irreplaceable data on passthrough drives it's a footgun, not a feature
 ([lesson #12](lessons.md#12-single-host-means-no-cephzfs-pool)).
 
-Thin-provisioning note: the boot-disk caps add up to more than the pool (434 G promised vs
-349 G real). That's fine — thin disks only consume written blocks — as long as you treat
+Thin-provisioning note: the boot-disk caps add up to more than the pool (434 GB promised vs
+349 GB real). That's fine — thin disks only consume written blocks — as long as you treat
 disk size as a *cap*, not an allocation, and never let every VM fill up at once.
 
 ## RAM: the actual bottleneck

@@ -27,7 +27,7 @@
 ## TL;DR
 
 - **One 16 GB desktop box, six VMs** — a hard RAM budget, not wishful overcommit ([architecture](docs/architecture.md)).
-- **The old bare-metal server lives on as VM 100** — same IP, same data, restored from a ~28 GB encrypted offsite backup; the 6+ TB media drives were passed through raw and never copied ([migration](docs/migration.md)).
+- **The old bare-metal server lives on as VM 100** — same IP, same data, restored from a ~28 GB encrypted offsite backup; the media drives — 6+ TB of data — were passed through raw and never copied ([migration](docs/migration.md)).
 - **Every lab VM is born behind a VPN** — a 512 MB Alpine gateway VM tunnels an isolated bridge through Mullvad WireGuard, killswitch enforced by `FORWARD DROP`, not by a watchdog ([vpn-gateway](docs/vpn-gateway.md)).
 - **Real hardware in the guest** — RTX 2060 via vfio for NVENC/ML, two 4 TB drives as whole-disk passthrough ([passthrough](docs/passthrough.md)).
 - **Fourteen operational lessons** written down so they only cost once ([lessons](docs/lessons.md)).
@@ -63,12 +63,15 @@ Since then the host has grown a VPN gateway VM and four on-demand lab VMs. Full 
 <table align="center">
   <tr>
     <td align="center" width="160"><h2>6</h2>VMs on one host</td>
-    <td align="center" width="160"><h2>~45</h2>containers in VM 100</td>
+    <td align="center" width="160"><h2>42</h2>containers in VM 100</td>
     <td align="center" width="160"><h2>8 TB</h2>passed through raw</td>
     <td align="center" width="160"><h2>0</h2>open inbound ports</td>
     <td align="center" width="160"><h2>~35 W</h2>total draw</td>
   </tr>
 </table>
+
+Sourced from [`docs/metrics.md`](docs/metrics.md) — every figure links back to the
+command that produced it.
 
 ---
 
@@ -85,6 +88,20 @@ Since then the host has grown a VPN gateway VM and four on-demand lab VMs. Full 
 
 Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 ([docs/vms.md](docs/vms.md)).
+
+---
+
+## Showcase
+
+<p align="center">
+  <img src="docs/img/qm-list.png" alt="qm list on the host — six VMs, two running (docker-host and vpn-gw), four stopped lab VMs" width="760"/><br/>
+  <sub><b>qm list</b> — the fleet: two always-on, four on demand</sub>
+</p>
+
+<p align="center">
+  <img src="docs/img/pvesm-status.png" alt="pvesm status — local, the local-lvm thin pool, and the dedicated vzdump backup storage" width="760"/><br/>
+  <sub><b>pvesm status</b> — boot disks on the thin pool, backups on their own spindle</sub>
+</p>
 
 ---
 
@@ -116,6 +133,9 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 │   ├── passthrough.md     # GPU (vfio) + whole-disk passthrough, gotchas
 │   ├── backup.md          # Two-tier strategy: encrypted offsite vs vzdump images
 │   ├── vms.md             # Fleet, new-VM recipe, guest-agent tricks
+│   ├── decisions.md       # Why this and not that — the alternatives were real
+│   ├── runbook.md         # What to do when each layer breaks
+│   ├── metrics.md         # Every README number, with its receipt
 │   └── lessons.md         # 14 operational lessons, cross-referenced
 ├── scripts/               # sanitize-check.sh (pre-commit PII guard)
 └── .github/workflows/     # CI: shellcheck · yamllint · markdownlint · gitleaks
@@ -131,6 +151,9 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 - [`docs/passthrough.md`](docs/passthrough.md) — vfio GPU + raw disks, and every gotcha they charged for
 - [`docs/backup.md`](docs/backup.md) — what restores the system vs what's merely convenient
 - [`docs/vms.md`](docs/vms.md) — the fleet and the recipes
+- [`docs/decisions.md`](docs/decisions.md) — why these choices and not the alternatives
+- [`docs/runbook.md`](docs/runbook.md) — what to do when each layer breaks
+- [`docs/metrics.md`](docs/metrics.md) — every number above, with its receipt
 - [`docs/lessons.md`](docs/lessons.md) — start here if you're building something similar
 
 ---

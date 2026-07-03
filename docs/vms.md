@@ -7,7 +7,7 @@ bottleneck, not CPU ([budget](architecture.md#ram-the-actual-bottleneck)).
 
 | VMID | Name | OS | RAM | Bridge | onboot | Role |
 |---|---|---|---|---|---|---|
-| 100 | docker-host | Ubuntu 24.04 | 8 GB cap | vmbr0 | ✅ | The workload: ~45 containers, GPU + 2×4 TB passthrough — the [homelab stack](https://github.com/MrTorriz/homelab) |
+| 100 | docker-host | Ubuntu 24.04 | 8 GB cap | vmbr0 | ✅ | The workload: ~40 containers, GPU + 2×4 TB passthrough — the [homelab stack](https://github.com/MrTorriz/homelab) |
 | 101 | win11 | Windows 11 24H2 | 4 GB | vmbr1 | — | Desktop things Linux won't do. q35 + OVMF + vTPM 2.0, no GPU |
 | 102 | kali | Kali Linux | 4 GB | vmbr1 | — | Pentest lab |
 | 103 | nixos | NixOS | 4 GB | vmbr1 | — | Declarative-config playground (runs its own flake) |
