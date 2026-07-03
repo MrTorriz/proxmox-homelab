@@ -51,6 +51,15 @@ for f in "${FILES[@]}"; do
     fi
 done
 
+# Commit metadata goes public too — scan authors, committers and messages
+# across the full history, not just file contents.
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+    if git log --format='%h  %an <%ae> | %cn <%ce> | %s' | grep -En -- "$PATTERNS"; then
+        printf '\nsanitize-check: personal identifiers in commit metadata above.\n' >&2
+        FOUND=1
+    fi
+fi
+
 if [ "$FOUND" -eq 1 ]; then
     printf '\nsanitize-check: personal identifiers detected above. Aborting commit.\n' >&2
     exit 1
