@@ -1,0 +1,31 @@
+.env
+.env.local
+*.key
+*.pem
+*.crt
+secrets/
+appdata/
+backups/
+
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Local context file — never pushed
+CLAUDE.md
+
+# Local working journal — never pushed
+JOURNAL.md
+
+# Local tooling reference — never pushed
+TOOLS.md
+
+# Playwright artifacts (console logs, page snapshots)
+.playwright-mcp/
+
+# Personal sanitisation patterns — read by scripts/sanitize-check.sh
+# .sanitize-patterns.example is committed as a template
+.sanitize-patterns

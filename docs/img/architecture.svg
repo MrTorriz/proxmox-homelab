@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Proxmox homelab architecture: one host, two bridges, VPN gateway VM, passthrough workload VM">
+  <style>
+    text { font-family: ui-sans-serif, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif; fill: #e6edf7; }
+    .mono { font-family: ui-monospace, 'Cascadia Code', Consolas, Menlo, monospace; }
+    .muted { fill: #8fa0bf; }
+    .accent { fill: #f2a25c; }
+    .teal { fill: #7ee8d8; }
+    .yellow { fill: #ffd524; }
+    .title { font-size: 16px; font-weight: 600; }
+    .body { font-size: 12.5px; }
+    .small { font-size: 11px; }
+    .wire { stroke: #46557a; stroke-width: 1.6; fill: none; }
+    .vpnwire { stroke: #ffd524; stroke-width: 1.8; fill: none; stroke-dasharray: 7 5; opacity: .85; }
+  </style>
+
+  <rect x="0" y="0" width="1200" height="800" rx="16" fill="#0b1120"/>
+
+  <!-- Internet -->
+  <rect x="350" y="24" width="500" height="52" rx="26" fill="#1b2233" stroke="#3a4763" stroke-width="1.5"/>
+  <text x="600" y="50" text-anchor="middle" class="title" style="letter-spacing:4px">INTERNET</text>
+  <text x="600" y="66" text-anchor="middle" class="small muted">all egress encrypted — Mullvad WireGuard · Cloudflare Tunnel (outbound-only)</text>
+
+  <!-- Router -->
+  <line x1="600" y1="76" x2="600" y2="116" class="wire"/>
+  <rect x="470" y="116" width="260" height="48" rx="10" fill="#151d31" stroke="#3a4763" stroke-width="1.5"/>
+  <text x="600" y="137" text-anchor="middle" class="body" style="font-weight:600">ISP router</text>
+  <text x="600" y="154" text-anchor="middle" class="small mono muted">192.168.1.1</text>
+  <line x1="600" y1="164" x2="600" y2="268" class="wire"/>
+
+  <!-- Encrypted egress curves -->
+  <path d="M 285 340 C 285 220, 430 110, 520 74" class="vpnwire"/>
+  <path d="M 750 340 C 760 230, 730 120, 690 76" class="vpnwire"/>
+
+  <!-- Host box -->
+  <rect x="40" y="210" width="1120" height="520" rx="14" fill="#111a2e" stroke="#e57000" stroke-width="2"/>
+  <text x="62" y="242" class="title accent">Proxmox VE — “pve”</text>
+  <text x="255" y="242" class="small muted">bare metal · i5-9400F (6c) · 16 GB · headless</text>
+  <text x="1138" y="242" text-anchor="end" class="small mono muted">192.168.1.4</text>
+
+  <!-- vmbr0 -->
+  <rect x="80" y="268" width="1040" height="26" rx="6" fill="#24304d"/>
+  <text x="600" y="285" text-anchor="middle" class="small" fill="#9fb2d8">vmbr0 — LAN bridge · physical NIC · 192.168.1.0/24</text>
+
+  <!-- VM 100 -->
+  <line x1="290" y1="294" x2="290" y2="340" class="wire"/>
+  <rect x="90" y="340" width="400" height="230" rx="10" fill="#16223e" stroke="#4f7df9" stroke-width="1.6"/>
+  <text x="110" y="369" class="title">VM 100 · docker-host</text>
+  <text x="470" y="369" text-anchor="end" class="small muted">8 GB cap · onboot</text>
+  <text x="110" y="394" class="body">Ubuntu 24.04 — the entire homelab stack</text>
+  <text x="110" y="414" class="body muted">~45 containers · media · photos · DNS · proxy · observability</text>
+  <text x="110" y="434" class="body muted">own Mullvad client, lockdown mode</text>
+  <rect x="110" y="452" width="175" height="44" rx="8" fill="#0f1a30" stroke="#2b3a5c"/>
+  <text x="197" y="470" text-anchor="middle" class="small" style="font-weight:600">RTX 2060</text>
+  <text x="197" y="486" text-anchor="middle" class="small muted">vfio GPU passthrough</text>
+  <rect x="297" y="452" width="175" height="44" rx="8" fill="#0f1a30" stroke="#2b3a5c"/>
+  <text x="384" y="470" text-anchor="middle" class="small" style="font-weight:600">2 × 4 TB HDD</text>
+  <text x="384" y="486" text-anchor="middle" class="small muted">raw disk passthrough</text>
+  <text x="110" y="546" class="small mono muted">192.168.1.5</text>
+
+  <!-- vpn-gw -->
+  <line x1="750" y1="294" x2="750" y2="340" class="wire"/>
+  <rect x="560" y="340" width="380" height="130" rx="10" fill="#1c2418" stroke="#d4b83a" stroke-width="1.6"/>
+  <text x="580" y="369" class="title">VM 105 · vpn-gw</text>
+  <text x="920" y="369" text-anchor="end" class="small muted">512 MB · onboot</text>
+  <text x="580" y="394" class="body">Alpine router — wg0 full tunnel to Mullvad</text>
+  <text x="580" y="414" class="body mono yellow" style="font-size:12px">iptables -P FORWARD DROP  → fail-closed killswitch</text>
+  <text x="580" y="436" class="body muted">dnsmasq: DHCP + in-tunnel DNS for the VPN LAN</text>
+  <line x1="750" y1="470" x2="750" y2="506" class="wire"/>
+
+  <!-- vmbr1 -->
+  <rect x="560" y="506" width="560" height="26" rx="6" fill="#123c38"/>
+  <text x="840" y="523" text-anchor="middle" class="small teal">vmbr1 — VPN LAN 10.10.10.0/24 · no physical port · no path except wg0</text>
+
+  <!-- Lab VMs -->
+  <g>
+    <line x1="622" y1="532" x2="622" y2="560" class="wire"/>
+    <rect x="560" y="560" width="125" height="92" rx="8" fill="#14262e" stroke="#1f4d57"/>
+    <text x="622" y="586" text-anchor="middle" class="body" style="font-weight:600">win11</text>
+    <text x="622" y="606" text-anchor="middle" class="small muted">VM 101 · 4 GB</text>
+    <text x="622" y="624" text-anchor="middle" class="small muted">OVMF + vTPM</text>
+    <text x="622" y="640" text-anchor="middle" class="small muted">on demand</text>
+  </g>
+  <g>
+    <line x1="767" y1="532" x2="767" y2="560" class="wire"/>
+    <rect x="705" y="560" width="125" height="92" rx="8" fill="#14262e" stroke="#1f4d57"/>
+    <text x="767" y="586" text-anchor="middle" class="body" style="font-weight:600">kali</text>
+    <text x="767" y="606" text-anchor="middle" class="small muted">VM 102 · 4 GB</text>
+    <text x="767" y="624" text-anchor="middle" class="small muted">pentest lab</text>
+    <text x="767" y="640" text-anchor="middle" class="small muted">on demand</text>
+  </g>
+  <g>
+    <line x1="912" y1="532" x2="912" y2="560" class="wire"/>
+    <rect x="850" y="560" width="125" height="92" rx="8" fill="#14262e" stroke="#1f4d57"/>
+    <text x="912" y="586" text-anchor="middle" class="body" style="font-weight:600">nixos</text>
+    <text x="912" y="606" text-anchor="middle" class="small muted">VM 103 · 4 GB</text>
+    <text x="912" y="624" text-anchor="middle" class="small muted">flake playground</text>
+    <text x="912" y="640" text-anchor="middle" class="small muted">on demand</text>
+  </g>
+  <g>
+    <line x1="1057" y1="532" x2="1057" y2="560" class="wire"/>
+    <rect x="995" y="560" width="125" height="92" rx="8" fill="#14262e" stroke="#1f4d57"/>
+    <text x="1057" y="586" text-anchor="middle" class="body" style="font-weight:600">arch</text>
+    <text x="1057" y="606" text-anchor="middle" class="small muted">VM 104 · 4 GB</text>
+    <text x="1057" y="624" text-anchor="middle" class="small muted">rolling lab</text>
+    <text x="1057" y="640" text-anchor="middle" class="small muted">on demand</text>
+  </g>
+
+  <!-- Host storage -->
+  <text x="90" y="614" class="small muted" style="letter-spacing:2px">HOST STORAGE</text>
+  <rect x="90" y="624" width="190" height="66" rx="8" fill="#0f1a30" stroke="#2b3a5c"/>
+  <text x="185" y="650" text-anchor="middle" class="small" style="font-weight:600">NVMe 480 GB</text>
+  <text x="185" y="668" text-anchor="middle" class="small muted">Proxmox root + VM disks</text>
+  <rect x="300" y="624" width="190" height="66" rx="8" fill="#0f1a30" stroke="#2b3a5c"/>
+  <text x="395" y="650" text-anchor="middle" class="small" style="font-weight:600">HDD 1 TB</text>
+  <text x="395" y="668" text-anchor="middle" class="small muted">vzdump weekly · keep 3</text>
+
+  <!-- Legend -->
+  <line x1="90" y1="762" x2="130" y2="762" class="vpnwire"/>
+  <text x="140" y="766" class="small muted">encrypted WireGuard egress</text>
+  <line x1="340" y1="762" x2="380" y2="762" class="wire"/>
+  <text x="390" y="766" class="small muted">LAN / bridge link</text>
+  <text x="1138" y="766" text-anchor="end" class="small muted">0 open inbound ports — external access only via outbound tunnels</text>
+</svg>
