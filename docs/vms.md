@@ -14,7 +14,7 @@ bottleneck, not CPU ([budget](architecture.md#ram-the-actual-bottleneck)).
 | 104 | arch | Arch Linux | 4 GB | vmbr1 | — | Rolling-release playground |
 | 105 | vpn-gw | Alpine | 512 MB | vmbr0+vmbr1 | ✅ | [Mullvad WireGuard gateway](vpn-gateway.md), fail-closed killswitch |
 
-Every lab VM (101–104) sits on `vmbr1` — born behind the VPN, no opt-in required.
+Every lab VM (101–104) sits on `vmbr1` — VPN coverage comes with the bridge, no opt-in required.
 The Windows VM's exit IP was verified as a Mullvad endpoint before first use.
 
 ## Recipe: a new (GPU-less) guest VM

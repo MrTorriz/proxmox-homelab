@@ -9,8 +9,8 @@ The hypervisor runs virtualization and hardware health. Nothing else.
 
 | Layer | Machine | Responsibility |
 |---|---|---|
-| Hypervisor | `pve` (bare metal) | QEMU/KVM, vzdump backups (target failed 2026-07-17, not yet replaced), SMART monitoring, power metering (RAPL) |
-| Workload | VM 100 (Ubuntu 24.04) | ~40 Docker containers — the entire [homelab stack](https://github.com/MrTorriz/homelab) |
+| Hypervisor | `pve` (bare metal) | QEMU/KVM, vzdump backups (target failed 2026-07-17, not yet replaced), SMART monitoring, notifications |
+| Workload | VM 100 (Ubuntu 24.04) | 44 Docker containers (2026-08-28) — the entire [homelab stack](https://github.com/MrTorriz/homelab) |
 | VPN edge | VM 105 (Alpine) | WireGuard gateway with fail-closed killswitch for the lab VMs |
 | Lab | VMs 101–104 | Windows 11, Kali, NixOS, Arch — on demand, never always-on |
 
@@ -54,9 +54,9 @@ their own (`onboot=1` — see [lessons](lessons.md#1-onboot1-on-every-production
   is dropped, not leaked — the `FORWARD` policy is `DROP`
   ([details](vpn-gateway.md)).
 
-Design goal inherited from the bare-metal era: **zero unencrypted traffic to the ISP**.
-Every lab VM is born behind the VPN — putting a machine on `vmbr0` is the exception that
-needs a reason, not the default.
+Design goal inherited from the bare-metal era: **no unencrypted traffic to the ISP**.
+Lab VMs land on `vmbr1` by default — putting a machine on `vmbr0` is the exception that
+needs a reason.
 
 ## Storage: three tiers, one hard line
 
@@ -115,6 +115,8 @@ Full recipe and gotchas: [passthrough.md](passthrough.md).
 
 ## Power
 
-~35 W total draw at idle workload (measured by scaphandre on the host — RAPL isn't
-available inside a VM, so power metering is one of the few things that *must* live on the
-hypervisor). CPU ~17 W, GPU ~18 W.
+Not re-measured since 2026-07-03. The last figures — ~17 W CPU package, ~15–18 W GPU at
+idle, ~35 W as the working total — came from Scaphandre on the host (RAPL isn't available
+inside a VM, so power metering is one of the few things that *must* live on the
+hypervisor). Scaphandre was removed from the host on 2026-07-04; until a meter is back
+these numbers are history, not status ([metrics](metrics.md)).

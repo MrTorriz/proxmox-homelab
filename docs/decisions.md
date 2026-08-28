@@ -29,7 +29,7 @@ thinner).
 ## Why the workload stayed one big VM
 
 The migration was restore-shaped: same compose stack, same IP, zero re-architecture.
-Splitting services across VMs or moving to Kubernetes would have turned a zero-data-loss
+Splitting services across VMs or moving to Kubernetes would have turned a restore-shaped
 weekend into a redesign project — on a 16 GB single node where k8s buys overhead
 without buying HA. Compose already orchestrates the stack fine.
 

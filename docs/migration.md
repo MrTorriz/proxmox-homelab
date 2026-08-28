@@ -1,4 +1,4 @@
-# The migration: bare metal → hypervisor, same box, zero data loss
+# The migration: bare metal → hypervisor, same box, nothing copied
 
 The [homelab](https://github.com/MrTorriz/homelab) ran on bare-metal Ubuntu 24.04. This
 is how the same physical machine became a Proxmox host with that server living on as
@@ -10,7 +10,7 @@ One machine, no second box to stage on. The plan:
 
 1. Back up the SSD's "soul" (appdata, configs, secrets) offsite, encrypted.
 2. Wipe the SSD, install Proxmox VE.
-3. Recreate the server as a VM via cloud-init, restore the soul.
+3. Recreate the server as a VM via cloud-init, restore it.
 4. Hand the data drives (2 × 4 TB, untouched by the wipe) to the VM as raw passthrough.
 5. Pass through the GPU.
 
@@ -105,4 +105,5 @@ everything you thought of is exactly as good as your memory.
 Databases were verified live rather than restored from dumps (row counts, user counts,
 asset counts — all matched). The dumps stayed as fallback and were never needed. Power
 metering was the one service that couldn't survive virtualization: RAPL doesn't exist in
-a VM, so it moved to the hypervisor — the only workload the host gained.
+a VM, so it moved to the hypervisor — the only workload the host gained (and gave up
+again on 2026-07-04; see [metrics](metrics.md)).
