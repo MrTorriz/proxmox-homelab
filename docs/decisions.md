@@ -29,7 +29,7 @@ thinner).
 ## Why the workload stayed one big VM
 
 The migration was restore-shaped: same compose stack, same IP, zero re-architecture.
-Splitting services across VMs or moving to Kubernetes would have turned a zero-data-loss
+Splitting services across VMs or moving to Kubernetes would have turned a restore-shaped
 weekend into a redesign project — on a 16 GB single node where k8s buys overhead
 without buying HA. Compose already orchestrates the stack fine.
 
@@ -38,7 +38,7 @@ without failover).
 
 ## Why a 512 MB Alpine gateway — not pfSense/OPNsense
 
-The job is WireGuard + NAT + dnsmasq + four iptables rules. A BSD firewall appliance
+The job is WireGuard + NAT + dnsmasq + six iptables rules and a DROP policy. A BSD firewall appliance
 wants 1–2 GB of RAM and a web UI to do the same thing with more moving parts — and RAM
 is [the actual bottleneck](architecture.md#ram-the-actual-bottleneck). The fail-closed
 property comes from the `FORWARD DROP` policy, not from appliance features
@@ -76,7 +76,9 @@ single SSD gives ZFS nothing to heal from anyway.
 Because they answer different questions: tier 1 (encrypted offsite appdata) answers
 "the building burned down", tier 2 (local vzdump images) answers "that upgrade was a
 mistake". Mixing them up produces backups that restore the wrong thing
-([backup](backup.md)).
+([backup](backup.md)). Losing tier 2 on 2026-07-17 (the backup disk died) didn't change
+the answer — tier 1 still restores the system — it only removed the convenience of a
+30-minute rollback until the disk is replaced.
 
 ## Why cloud-init for VM builds
 

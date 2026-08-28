@@ -7,14 +7,14 @@ bottleneck, not CPU ([budget](architecture.md#ram-the-actual-bottleneck)).
 
 | VMID | Name | OS | RAM | Bridge | onboot | Role |
 |---|---|---|---|---|---|---|
-| 100 | docker-host | Ubuntu 24.04 | 8 GB cap | vmbr0 | ✅ | The workload: ~40 containers, GPU + 2×4 TB passthrough — the [homelab stack](https://github.com/MrTorriz/homelab) |
+| 100 | docker-host | Ubuntu 24.04 | 10 GB cap | vmbr0 | ✅ | The workload: 44 containers (2026-08-28), GPU + 2×4 TB passthrough — the [homelab stack](https://github.com/MrTorriz/homelab) |
 | 101 | win11 | Windows 11 24H2 | 4 GB | vmbr1 | — | Desktop things Linux won't do. q35 + OVMF + vTPM 2.0, no GPU |
 | 102 | kali | Kali Linux | 4 GB | vmbr1 | — | Pentest lab |
 | 103 | nixos | NixOS | 4 GB | vmbr1 | — | Declarative-config playground (runs its own flake) |
 | 104 | arch | Arch Linux | 4 GB | vmbr1 | — | Rolling-release playground |
 | 105 | vpn-gw | Alpine | 512 MB | vmbr0+vmbr1 | ✅ | [Mullvad WireGuard gateway](vpn-gateway.md), fail-closed killswitch |
 
-Every lab VM (101–104) sits on `vmbr1` — born behind the VPN, no opt-in required.
+Every lab VM (101–104) sits on `vmbr1` — VPN coverage comes with the bridge, no opt-in required.
 The Windows VM's exit IP was verified as a Mullvad endpoint before first use.
 
 ## Recipe: a new (GPU-less) guest VM
