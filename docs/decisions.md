@@ -38,7 +38,7 @@ without failover).
 
 ## Why a 512 MB Alpine gateway — not pfSense/OPNsense
 
-The job is WireGuard + NAT + dnsmasq + four iptables rules. A BSD firewall appliance
+The job is WireGuard + NAT + dnsmasq + six iptables rules and a DROP policy. A BSD firewall appliance
 wants 1–2 GB of RAM and a web UI to do the same thing with more moving parts — and RAM
 is [the actual bottleneck](architecture.md#ram-the-actual-bottleneck). The fail-closed
 property comes from the `FORWARD DROP` policy, not from appliance features

@@ -77,7 +77,7 @@ irreplaceable data on passthrough drives it's a footgun, not a feature
 ([lesson #12](lessons.md#12-single-host-means-no-cephzfs-pool)).
 
 Thin-provisioning note: the boot-disk caps add up to more than the pool (434 GB promised vs
-349 GB real). That's fine — thin disks only consume written blocks — as long as you treat
+349 GiB real). That's fine — thin disks only consume written blocks — as long as you treat
 disk size as a *cap*, not an allocation, and never let every VM fill up at once.
 
 ## RAM: the actual bottleneck

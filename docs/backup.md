@@ -26,7 +26,8 @@ documents) is what tier 1 covers.
 > 1953525168 to 0`) — a dead drive, not a loose cable. `/mnt/vzbackup` is empty (fstab
 > `nofail`), `pvesm status` reports the storage `inactive`, and the scheduled job has
 > failed every Sunday since 2026-07-19 with `could not activate storage 'vzbackup'` —
-> notified through ntfy each time. The last good images were on the dead disk. The only
+> the first failure notified a dead `mail-to-root`, every one since 2026-07-26 went
+> through ntfy. The last good images were on the dead disk. The only
 > VM image on the host today is an emergency dump of VM 105 (77 MB, on `local`,
 > 2026-07-25). **No image of VM 100 or 101 exists.**
 >
@@ -70,7 +71,7 @@ the same thin pool as the VM disk; it's an undo button, not a backup. Take it an
 
 ```bash
 # Fails while the vzdump storage is inactive (since 2026-07-17). Until the disk is
-# replaced, an emergency image can target `local` — mind the 98 GB root: one VM at a
+# replaced, an emergency image can target `local` — mind the 94 GiB root: one VM at a
 # time, prune by hand.
 vzdump 100 --storage <backup-storage> --mode snapshot --compress zstd
 ```
