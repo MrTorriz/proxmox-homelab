@@ -30,7 +30,7 @@
 - **The old bare-metal server lives on as VM 100** — same IP, same data, restored from a ~28 GB encrypted offsite backup; the media drives — 6+ TB of data — were passed through raw and never copied ([migration](docs/migration.md)).
 - **Every lab VM is born behind a VPN** — a 512 MB Alpine gateway VM tunnels an isolated bridge through Mullvad WireGuard, killswitch enforced by `FORWARD DROP`, not by a watchdog ([vpn-gateway](docs/vpn-gateway.md)).
 - **Real hardware in the guest** — RTX 2060 via vfio for NVENC/ML, two 4 TB drives as whole-disk passthrough ([passthrough](docs/passthrough.md)).
-- **Fourteen operational lessons** written down so they only cost once ([lessons](docs/lessons.md)).
+- **Fifteen operational lessons** written down so they only cost once ([lessons](docs/lessons.md)).
 
 <p align="center">
   <img src="docs/img/architecture.svg" alt="Architecture — internet at top, ISP router, Proxmox host with two bridges: vmbr0 (LAN) carrying the Docker workload VM with GPU and disk passthrough, and vmbr1 (VPN LAN) where four lab VMs sit behind an Alpine WireGuard gateway with a fail-closed killswitch" width="920"/>
@@ -136,7 +136,7 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 │   ├── decisions.md       # Why this and not that — the alternatives were real
 │   ├── runbook.md         # What to do when each layer breaks
 │   ├── metrics.md         # Every README number, with its receipt
-│   └── lessons.md         # 14 operational lessons, cross-referenced
+│   └── lessons.md         # 15 operational lessons, cross-referenced
 ├── scripts/               # sanitize-check.sh (pre-commit PII guard)
 └── .github/workflows/     # CI: shellcheck · yamllint · markdownlint · gitleaks
 ```

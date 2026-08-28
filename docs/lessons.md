@@ -1,6 +1,6 @@
 # Operational lessons
 
-Fourteen things this setup taught the hard way. Numbered because the other docs
+Fifteen things this setup taught the hard way. Numbered because the other docs
 cross-reference them.
 
 ## 1. `onboot=1` on every production VM
@@ -91,5 +91,22 @@ should be a 40 GB backup.
 cache, and without free-page reporting the host never gets it back. The web UI then
 shows the VM eating the host. The real lever is the **`memory=` cap itself** — lower it
 (takes effect at VM restart, not live) to what the workload actually uses. Cap 13→8 GB
-freed 5 GB for other guests; actual workload was ~5 GB all along. Same mental model as
-thin disks (#11): the number is a ceiling the guest *will* grow into, not a measurement.
+freed 5 GB for other guests; actual workload was ~5 GB all along (raised again to 10 GB
+on 2026-07-04 as the workload grew — the cap follows the measured need, both ways). Same
+mental model as thin disks (#11): the number is a ceiling the guest *will* grow into, not
+a measurement.
+
+## 15. `nofail` + `is_mountpoint` hide a dead backup target — alert on missing successes, not just failures
+
+The vzdump disk died during a host reboot (2026-07-17). `nofail` in fstab let the host
+boot without complaint; `is_mountpoint=1` did its job on the next scheduled run and
+refused to write images into the NVMe root. Correct behaviour, twice — and the outcome
+was a backup tier that had been dead for eight days before anyone knew. The failure
+notification went to `mail-to-root`, which had stopped delivering the same day: a
+postfix hardening pass on the workload VM. The job failed, Proxmox dutifully notified a
+target that led nowhere, and the gap was found by a manual health check a week and a
+missed run later. Fixes: notifications now go through a webhook to ntfy (a target that
+is checked end-to-end, not assumed), plus a five-minute host healthcheck timer that
+posts on missing VMs and inactive storage. The lesson is two rules: a backup that has
+not reported *success* by its deadline is an alarm, not an absence of news — and never
+route alarms through a component you are hardening on the same day.
