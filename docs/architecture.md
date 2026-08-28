@@ -18,6 +18,18 @@ No Docker on the host. No DNS on the host. No packages beyond what virtualizatio
 The payoff: the host can be rebooted or upgraded at any time and the services come back on
 their own (`onboot=1` — see [lessons](lessons.md#1-onboot1-on-every-production-vm)).
 
+## What the host does run
+
+"Nothing" has a short list of exceptions, each with a reason. Verified 2026-08-28.
+
+| Piece | What | Why |
+|---|---|---|
+| Notifications | A user-created Proxmox notification target `ntfy` (type **webhook**) posting to the ntfy server in VM 100; the single `default-matcher` routes everything to it. The token is a Proxmox secret in `/etc/pve/priv/notifications.cfg`. The stock `mail-to-root` target still exists but has been dead since 2026-07-17. | A failed job must reach a phone, not a mailbox nobody reads ([lesson #15](lessons.md#15-nofail--is_mountpoint-hide-a-dead-backup-target--alert-on-missing-successes-not-just-failures)). Every failed vzdump since logs `notified via target ntfy`. |
+| `pve-healthcheck.timer` | Every 5 minutes: are the always-on VMs running, is every storage active → ntfy on deviation. | Alert on *missing successes*, not only on failures — the dead backup target was silent for eight days. |
+| IPv6 off | `/etc/sysctl.d/99-disable-ipv6.conf` (`all` + `default` disabled) since 2026-06-26; zero global v6 addresses on the host. | The ISP provides no routable v6; a half-configured v6 stack is a leak vector, not a feature. |
+| `unattended-upgrades` | On, origins limited to Debian security; the Proxmox repository is excluded; no automatic reboot. | Security patches land on their own. PVE upgrades and reboots stay a deliberate act — a host reboot is what took the backup disk with it. |
+| `pve-firewall` | Enabled and running, `policy_in DROP`, `policy_out ACCEPT`. | The management plane is closed by default; the LAN gets an explicit allow. |
+
 ## Network: two bridges, two trust zones
 
 ```text
@@ -70,14 +82,17 @@ disk size as a *cap*, not an allocation, and never let every VM fill up at once.
 
 ## RAM: the actual bottleneck
 
-16 GB total, no free slots. Budget:
+16 GB total, no free slots. Budget (2026-08-28):
 
 | Consumer | Budget |
 |---|---|
-| VM 100 (workload) | 8 GB hard cap |
+| VM 100 (workload) | 10 GB hard cap (`memory=10240`) |
 | One lab VM at a time | 4 GB |
-| Host + kernel | ~2 GB |
-| Slack | ~2 GB |
+| Host + kernel | ~1.5 GB |
+| vpn-gw | 0.5 GB |
+| **Sum** | **16 GB** — the whole box |
+
+The sum is the box. One lab VM at a time is a rule, not advice.
 
 Two things made this budget real instead of aspirational:
 
@@ -85,6 +100,9 @@ Two things made this budget real instead of aspirational:
    and ballooning does *not* hand host RSS back on a running VM. VM 100 originally had a
    13 GB cap and sat at 13 GB host-RSS while doing ~5 GB of real work. Lowering the cap
    (applies at VM restart) freed ~5 GB ([lesson #14](lessons.md#14-ballooning-does-not-return-host-ram-on-a-running-vm)).
+   It went back up to 10 GB on 2026-07-04 after an ML + transcode spike pushed the guest
+   into swap thrashing at 8 GB — the cap follows measured need in both directions, and
+   the guest carries a 2 GB swapfile as a safety valve.
 2. **Lab VMs are `onboot=0` and started manually.** One heavy guest at a time. The
    scheduler shares 6 cores fine; RAM does not overcommit gracefully.
 

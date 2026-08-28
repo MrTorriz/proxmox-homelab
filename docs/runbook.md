@@ -73,6 +73,19 @@ or Proxmox will happily fill the NVMe root instead), leave the job as it is — 
 stopped trying — and run one manual `vzdump` of 100, 101 and 105 to reseed. Then confirm
 the *success* notification arrives, not just the failures.
 
+## A notification didn't arrive
+
+Silence from the host is not good news until proven ([lesson #15](lessons.md#15-nofail--is_mountpoint-hide-a-dead-backup-target--alert-on-missing-successes-not-just-failures)).
+
+```bash
+pvesh create /cluster/notifications/targets/ntfy/test   # a test message must land on the phone
+pvesh get /cluster/notifications/matchers               # default-matcher → ntfy, not mail-to-root
+systemctl status pve-healthcheck.timer                  # the 5-minute watchdog: active (waiting)
+```
+
+If the test lands but a job's notification didn't, read the job's log — a failed vzdump
+ends with `notified via target ntfy`; if that line is missing, the matcher is the problem.
+
 ## A 4 TB data drive dies
 
 Bulk media on the dead drive is gone by design — 6+ TB doesn't fit an offsite budget.

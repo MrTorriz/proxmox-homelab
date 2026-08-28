@@ -34,40 +34,54 @@ the LAN. The *only* route from `vmbr1` to anywhere is through `wg0`.
 
 | | |
 |---|---|
-| OS | Alpine Linux (sys install) |
+| OS | Alpine Linux 3.24.1 (sys install) — as of 2026-08-28 |
 | CPU / RAM | 2 cores / 512 MB (balloon 256) — always-on infra should be lean |
 | Disk | 4 GB on the NVMe thin pool |
-| net0 | virtio → `vmbr0` (WAN side, DHCP) |
-| net1 | virtio → `vmbr1` (10.10.10.1/24) |
+| net0 | virtio → `vmbr0` (WAN side, `eth0` static 192.168.1.6/24) |
+| net1 | virtio → `vmbr1` (`eth1` 10.10.10.1/24) |
 | onboot | **1** — other VMs depend on it |
 | BIOS | SeaBIOS, no GPU, no TPM |
+| Services (default runlevel) | `iptables`, `dnsmasq`, `wg-quick.wg0`, `qemu-guest-agent` — plain iptables, no nftables |
 
 ## The killswitch
 
-NAT plus three forward rules, persisted in `/etc/iptables/rules-save`:
+One NAT rule, two forward rules and a `DROP` policy, persisted in
+`/etc/iptables/rules-save`. Verified against the live ruleset 2026-08-28 — `FORWARD`
+and `nat` are the complete chains, `OUTPUT` is condensed:
 
 ```text
+# nat — the only NAT rule; nothing is ever masqueraded out of eth0
 iptables -t nat -A POSTROUTING -s 10.10.10.0/24 -o wg0 -j MASQUERADE
+
+# filter — FORWARD: exactly these two rules, then the policy
+iptables -P FORWARD DROP
 iptables -A FORWARD -i eth1 -o wg0 -j ACCEPT
 iptables -A FORWARD -i wg0 -o eth1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -P FORWARD DROP
+
+# filter — OUTPUT: the gateway's own WAN-side traffic is LAN + the WireGuard handshake
+iptables -A OUTPUT -o eth0 -d 192.168.1.0/24 -j ACCEPT
+iptables -A OUTPUT -o eth0 -p udp --dport 51820 -j ACCEPT
+iptables -A OUTPUT -o eth0 -j DROP        # last rule on eth0
 ```
 
-The last line is the killswitch: forwarding is only ever allowed **into the tunnel**.
-There is no `eth1 → eth0` rule, so client traffic can't fall back to the raw WAN path —
-if `wg0` disappears, packets hit the `DROP` policy. Fail-closed by construction, not by a
-watchdog.
+The `FORWARD` policy is the killswitch: forwarding is only ever allowed **into the
+tunnel**. There is no `eth1 → eth0` rule, so client traffic can't fall back to the raw
+WAN path — if `wg0` disappears, packets hit the `DROP` policy. Fail-closed by
+construction, not by a watchdog. The `OUTPUT` chain closes the second door: the
+gateway itself can't leak either (no DNS, no NTP, no package fetch on `eth0` — only
+the LAN and UDP/51820 to the WireGuard peer).
 
 Supporting pieces:
 
 - **WireGuard** — `/etc/wireguard/wg0.conf` (Mullvad config, full tunnel), started by the
   `wg-quick.wg0` OpenRC service. The private key lives only on the VM — never in this or
   any repo. Disaster recovery = generate a fresh config at mullvad.net.
-- **dnsmasq** — `/etc/dnsmasq.d/vpn-lan.conf`: DHCP range 10.10.10.100–200, gateway/DNS
-  10.10.10.1, upstream DNS = Mullvad's in-tunnel resolver (`10.64.0.1`), so DNS can't
-  leak either.
+- **dnsmasq** — `/etc/dnsmasq.d/vpn-lan.conf`: bound to `interface=eth1` only, DHCP
+  range 10.10.10.100–200 (12 h leases), gateway/DNS 10.10.10.1, upstream DNS = Mullvad's
+  in-tunnel resolver (`10.64.0.1`), so DNS can't leak either.
 - **sysctl** — `net.ipv4.ip_forward=1`, IPv6 disabled entirely (the ISP provides no
-  routable v6; a half-configured v6 stack is just a leak vector).
+  routable v6; a half-configured v6 stack is just a leak vector). Belt and braces:
+  `ip6tables` has `INPUT`, `FORWARD` and `OUTPUT` at policy `DROP` as well.
 
 ## Putting a VM behind the VPN
 
@@ -87,7 +101,13 @@ Moving back to the LAN is the same command with `bridge=vmbr0`.
 ssh root@<vpn-gw> 'wg show wg0'                            # handshake recent?
 ssh root@<vpn-gw> 'curl -s https://am.i.mullvad.net/json'  # "mullvad_exit_ip": true
 ssh root@<vpn-gw> 'iptables -L FORWARD -n | head -3'       # policy DROP
+ssh root@<vpn-gw> 'iptables -S OUTPUT | tail -1'           # -A OUTPUT -o eth0 -j DROP
+ssh root@<vpn-gw> 'ip6tables -S | head -3'                 # -P INPUT/FORWARD/OUTPUT DROP
 ```
+
+All five checks passed on 2026-08-28: handshake current, `mullvad_exit_ip: true`
+(a Stockholm exit), `FORWARD` policy `DROP` with exactly the two rules above, `OUTPUT`
+ending in the `eth0` drop, `ip6tables` all-`DROP`.
 
 The workload VM (100) does **not** route through this gateway — it stays on `vmbr0` with
 its own Mullvad client in lockdown mode, because it also has to serve the LAN (DNS,
