@@ -136,8 +136,9 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 │   ├── runbook.md         # What to do when each layer breaks
 │   ├── metrics.md         # Every README number, with its receipt
 │   └── lessons.md         # 15 operational lessons, cross-referenced
-├── scripts/               # sanitize-check.sh (pre-commit PII guard)
-└── .github/workflows/     # CI: shellcheck · yamllint · markdownlint · gitleaks
+├── scripts/               # sanitize-check.sh (pre-commit PII guard) · check-links.sh (CI)
+├── SECURITY.md            # How to report a sanitization miss
+└── .github/workflows/     # CI: shellcheck · yamllint · markdownlint · links · gitleaks
 ```
 
 ---
