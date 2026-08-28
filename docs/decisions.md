@@ -76,7 +76,9 @@ single SSD gives ZFS nothing to heal from anyway.
 Because they answer different questions: tier 1 (encrypted offsite appdata) answers
 "the building burned down", tier 2 (local vzdump images) answers "that upgrade was a
 mistake". Mixing them up produces backups that restore the wrong thing
-([backup](backup.md)).
+([backup](backup.md)). Losing tier 2 on 2026-07-17 (the backup disk died) didn't change
+the answer — tier 1 still restores the system — it only removed the convenience of a
+30-minute rollback until the disk is replaced.
 
 ## Why cloud-init for VM builds
 

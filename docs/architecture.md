@@ -9,7 +9,7 @@ The hypervisor runs virtualization and hardware health. Nothing else.
 
 | Layer | Machine | Responsibility |
 |---|---|---|
-| Hypervisor | `pve` (bare metal) | QEMU/KVM, vzdump backups, SMART monitoring, power metering (RAPL) |
+| Hypervisor | `pve` (bare metal) | QEMU/KVM, vzdump backups (target failed 2026-07-17, not yet replaced), SMART monitoring, power metering (RAPL) |
 | Workload | VM 100 (Ubuntu 24.04) | ~40 Docker containers — the entire [homelab stack](https://github.com/MrTorriz/homelab) |
 | VPN edge | VM 105 (Alpine) | WireGuard gateway with fail-closed killswitch for the lab VMs |
 | Lab | VMs 101–104 | Windows 11, Kali, NixOS, Arch — on demand, never always-on |
@@ -52,7 +52,7 @@ needs a reason, not the default.
 |---|---|---|
 | NVMe SSD | 480 GB | Proxmox root + `local-lvm` thin pool (all VM boot disks) |
 | 2 × WD Red Plus (CMR) | 4 TB each | **Raw passthrough to VM 100** — media + backup data, untouched by the hypervisor |
-| SATA HDD | 1 TB | Dedicated `vzdump` target (weekly VM images, `keep-last=3`) |
+| SATA HDD | 1 TB | Dedicated `vzdump` target (weekly VM images, `keep-last=3`) — **failed 2026-07-17, not yet replaced** ([backup](backup.md#tier-2--vm-images-vzdump-local-scheduled)) |
 
 The two 4 TB drives are handed to VM 100 as whole-disk passthrough (`scsi1`/`scsi2`,
 `backup=0`). The hypervisor never mounts, formats, or backs them up — they carry the same
