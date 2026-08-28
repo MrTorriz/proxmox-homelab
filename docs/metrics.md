@@ -11,7 +11,7 @@ previous pass (2026-07-03) and say why.
 | VMs on the host | 6 (2 running) | ✔ | `qm list` ([recreation](img/qm-list.png)) |
 | Running containers in VM 100 | 44 (0 privileged) | ✔ | `docker ps -q \| wc -l` inside the guest |
 | Raw disk passed through | 8 TB (2 × 4 TB) | ✔ | `qm config 100` → `scsi1`/`scsi2`, `backup=0` |
-| Inbound WAN ports | none configured on purpose — external access is an outbound Cloudflare Tunnel from VM 100 | ✘ — the router's port-forward table was not re-verified | [architecture](architecture.md#network-two-bridges-two-trust-zones) |
+| Inbound WAN ports | **not re-verified** — Outbound Cloudflare Tunnel is the intended ingress path; the router port-forward table was not re-verified on 2026-08-28. | ✘ | [architecture](architecture.md#network-two-bridges-two-trust-zones) |
 | Power | last 2026-07-03: ~17 W CPU / ~15–18 W GPU / ~35 W total | ✘ — Scaphandre was removed from the host 2026-07-04; not re-measured since 2026-07-03 | `scaph_host_power_microwatts` (RAPL, host) · `nvidia-smi --query-gpu=power.draw --format=csv` (guest) |
 | VM boot-disk pool | `local-lvm` 349 GiB, 30.08 % used | ✔ | `pvesm status` ([recreation](img/pvesm-status.png)) |
 | Host root | `local` 94 GiB, 30.59 % used | ✔ | `pvesm status` |

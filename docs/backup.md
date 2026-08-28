@@ -65,13 +65,22 @@ Details that matter:
 ## Snapshots are not backups
 
 `qm snapshot 100 pre-change` before any risky change — instant and free. But it lives in
-the same thin pool as the VM disk; it's an undo button, not a backup. Take it anyway.
+the same thin pool as the VM disk; it is a short-term undo button, not a backup. Take it
+anyway — and treat it as exactly that.
+
+**While tier 2 is offline, risky work waits.** Anything that would need an image restore
+to back out of (a major upgrade of the workload VM, storage or passthrough changes,
+a host upgrade) is postponed until `vzbackup` is back and a fresh image of VM 100 exists.
 
 ## Manual image before risky work
 
 ```bash
-# Fails while the vzdump storage is inactive (since 2026-07-17). Until the disk is
-# replaced, an emergency image can target `local` — mind the 94 GiB root: one VM at a
-# time, prune by hand.
-vzdump 100 --storage <backup-storage> --mode snapshot --compress zstd
+# Fails while the vzdump storage is inactive (since 2026-07-17):
+vzdump 100 --storage vzbackup --mode snapshot --compress zstd
 ```
+
+Do **not** point this at `local` for VM 100: on 2026-08-28 `local` had 63 316 504 KiB
+(~60 GiB) available and the last VM 100 image was ~78 GB — it does not fit, and a
+half-written image on the root filesystem is worse than none. `local` is only an option
+for a small guest (the 4 GB vpn-gw, whose 77 MB emergency dump lives there) and only
+after an explicit `pvesm status` capacity check.

@@ -12,9 +12,10 @@ it by hand. Set it the moment a VM becomes load-bearing: `qm set <vmid> --onboot
 ## 2. Keep the host minimal
 
 Only virtualization and hardware health belong on the hypervisor. Docker, apps, and DNS
-run in guests. Then the host can be rebooted or upgraded without the services caring
-(given #1). Every package on the host is one more reason a host upgrade can break a
-workload.
+run in guests. A host reboot or upgrade still stops every guest — this is one box, and
+host maintenance is a lab-wide outage — but with #1 the services come back on their own,
+and a minimal host has fewer reasons to need that reboot in the first place. Every package
+on the host is one more reason a host upgrade can break a workload.
 
 ## 3. Decide where truth lives — and mean it
 

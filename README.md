@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/MrTorriz/proxmox-homelab?style=flat-square&logo=git&logoColor=white)](https://github.com/MrTorriz/proxmox-homelab/commits/main)
 [![VMs](https://img.shields.io/badge/VMs-6-blue?style=flat-square&logo=proxmox&logoColor=white)](docs/vms.md)
-[![Ingress](https://img.shields.io/badge/ingress-tunnel--only-brightgreen?style=flat-square&logo=cloudflare&logoColor=white)](docs/architecture.md)
+[![Ingress](https://img.shields.io/badge/ingress-cloudflare_tunnel-brightgreen?style=flat-square&logo=cloudflare&logoColor=white)](docs/architecture.md)
 
 <br/>
 
@@ -21,6 +21,8 @@
 ---
 
 > **What this is.** A sanitized public reference of a real, running Proxmox host. The live configuration is the source of truth and lives in a private repository; this repo mirrors it with hostnames, domains and identifiers replaced. It is not drop-in reproducible.
+>
+> **Sanitization policy.** RFC1918 addressing (`192.168.1.0/24`, `10.10.10.0/24`) and the network topology are published deliberately — they are unreachable from outside and carry no identity. Hostnames, domains, MAC addresses, disk serials/WWNs, account and device identifiers, e-mail addresses and the ISP's name are replaced or removed.
 
 ## TL;DR
 
@@ -105,14 +107,14 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 ## Design principles
 
 1. **The host does nothing.** Virtualization and hardware health only. No Docker, no DNS,
-   no apps on the hypervisor — it can reboot any time and nobody notices. The short list
-   of exceptions is in [architecture](docs/architecture.md#what-the-host-does-run).
+   no apps on the hypervisor. Host maintenance still takes the whole lab down — every guest
+   stops with the host — but a minimal host needs those windows rarely, and `onboot=1`
+   brings everything back without a hand on the console. The short list of exceptions is in [architecture](docs/architecture.md#what-the-host-does-run).
 2. **No unencrypted egress.** The workload VM runs its own VPN client in lockdown mode;
    everything else sits on a bridge whose only exit is a WireGuard tunnel. Tunnel down =
    traffic dropped, not leaked.
-3. **Inbound stays closed.** No inbound WAN ports are configured on purpose — external
-   access rides an outbound Cloudflare Tunnel from the workload VM. The router's
-   port-forward table was not re-verified during the 2026-08-28 audit.
+3. **Ingress is an outbound tunnel.** External access rides a Cloudflare Tunnel from the
+   workload VM. Outbound Cloudflare Tunnel is the intended ingress path; the router port-forward table was not re-verified on 2026-08-28.
 4. **Caps, not measurements.** Thin disks and RAM ceilings are promises the guests will
    grow into. Budget them like they're real, because they become real
    ([lesson #14](docs/lessons.md#14-ballooning-does-not-return-host-ram-on-a-running-vm)).

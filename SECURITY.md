@@ -7,6 +7,8 @@ Nothing here runs anywhere except the CI linters, and nothing published here rea
 live system. The thing most likely to need reporting is a **sanitization miss**: a real
 hostname, address, identifier, credential or anything else that should not be public.
 
+**Sanitization policy.** RFC1918 addressing (`192.168.1.0/24`, `10.10.10.0/24`) and the network topology are published deliberately — they are unreachable from outside and carry no identity. Hostnames, domains, MAC addresses, disk serials/WWNs, account and device identifiers, e-mail addresses and the ISP's name are replaced or removed.
+
 ## Reporting
 
 Report privately through GitHub Security Advisories — **Security → Report a vulnerability**

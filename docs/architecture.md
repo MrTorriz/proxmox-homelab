@@ -15,8 +15,9 @@ The hypervisor runs virtualization and hardware health. Nothing else.
 | Lab | VMs 101–104 | Windows 11, Kali, NixOS, Arch — on demand, never always-on |
 
 No Docker on the host. No DNS on the host. No packages beyond what virtualization needs.
-The payoff: the host can be rebooted or upgraded at any time and the services come back on
-their own (`onboot=1` — see [lessons](lessons.md#1-onboot1-on-every-production-vm)).
+The payoff is not zero-impact maintenance — a host reboot stops every guest, so host
+upgrades are planned as lab-wide outages — but a host that needs it rarely, and services
+that come back on their own afterwards (`onboot=1` — see [lessons](lessons.md#1-onboot1-on-every-production-vm)).
 
 ## What the host does run
 
