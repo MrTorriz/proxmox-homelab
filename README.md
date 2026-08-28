@@ -94,13 +94,13 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 ## Showcase
 
 <p align="center">
-  <img src="docs/img/qm-list.png" alt="qm list on the host — six VMs, two running (docker-host and vpn-gw), four stopped lab VMs" width="760"/><br/>
-  <sub><b>qm list</b> — the fleet: two always-on, four on demand</sub>
+  <img src="docs/img/qm-list.png" alt="qm list on the host — six VMs, two running (docker-host at 10240 MB and vpn-gw), four stopped lab VMs at 4096 MB" width="900"/><br/>
+  <sub><b>qm list</b> — sanitized recreation from live-verified output (2026-08-28); VM 100 renamed docker-host</sub>
 </p>
 
 <p align="center">
-  <img src="docs/img/pvesm-status.png" alt="pvesm status — local, the local-lvm thin pool, and the dedicated vzdump backup storage" width="760"/><br/>
-  <sub><b>pvesm status</b> — boot disks on the thin pool, backups on their own spindle</sub>
+  <img src="docs/img/pvesm-status.png" alt="pvesm status — local and local-lvm active at about 30 percent used, vzbackup inactive, preceded by the warning that /mnt/vzbackup is not mounted" width="900"/><br/>
+  <sub><b>pvesm status</b> — recreation from live output (2026-08-28): local and local-lvm active, vzbackup inactive since the backup disk failed 2026-07-17</sub>
 </p>
 
 ---
