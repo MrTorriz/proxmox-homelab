@@ -1,8 +1,12 @@
 # Runbook — when things break
 
+> **Historical.** The Proxmox host was retired on 2026-09-13, so none of these procedures
+> apply any more. They are kept as written, with the state of 2026-08-28
+> ([README](../README.md)).
+
 Scenarios ordered by likelihood × pain. Everything here leans on the
 [backup strategy](backup.md): **tier 1** = encrypted offsite appdata (nightly),
-**tier 2** = local vzdump images (weekly by design — **offline since 2026-07-17**, the
+**tier 2** = local vzdump images (weekly by design — **offline after 2026-07-17**, the
 backup disk died; see [backup.md](backup.md#tier-2--vm-images-vzdump-local-scheduled)).
 The full-rebuild path isn't theoretical — it's exactly what [the migration](migration.md)
 executed, in one evening.
@@ -63,7 +67,7 @@ The data drives don't enter this scenario at all — they pass through untouched
 ## The backup HDD dies
 
 **This happened 2026-07-17.** The disk dropped off the bus during a host reboot; the
-job failed on the following Sunday and every Sunday since. Nothing irreplaceable was
+job failed on the following Sunday and every Sunday after that. Nothing irreplaceable was
 lost — tier 2 is convenience by design — but the failure went unnoticed for eight days
 because the alert path had been broken the same day
 ([lesson #15](lessons.md#15-nofail--is_mountpoint-hide-a-dead-backup-target--alert-on-missing-successes-not-just-failures)).
@@ -107,8 +111,8 @@ Corrected for the state on 2026-08-28 — tier 2 offline, no image of VM 100 or 
 | Failure | Data loss | Time to running | 2026-08-28 |
 |---|---|---|---|
 | VM 100, fast path | ≤ 7 days VM state, appdata patchable to ≤ 24 h | ~30 min | **n/a** — no image exists |
-| VM 100, full rebuild | ≤ 24 h (tier 1 is nightly) | an evening (proven) | the only path today |
+| VM 100, full rebuild | ≤ 24 h (tier 1 is nightly) | an evening (proven) | the only path then |
 | Host SSD | ≤ 24 h for VM 100 (tier 1); lab VMs are disposable | host install + an evening | no images to `qmrestore` — VM 100 goes through the full rebuild |
 | vpn-gw | none (stateless by design) | minutes | `qmrestore` the 77 MB dump from 2026-07-25, or rebuild from the recipe |
-| Backup HDD | none irreplaceable | replace at leisure | happened 2026-07-17; disk not yet replaced |
+| Backup HDD | none irreplaceable | replace at leisure | happened 2026-07-17; disk never replaced |
 | One data drive | bulk media on that drive | re-rip / re-download over time | — |

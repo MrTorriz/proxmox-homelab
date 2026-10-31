@@ -1,6 +1,10 @@
 # Architecture
 
-How one 16 GB desktop-class box runs a full self-hosted stack, four lab VMs, and a VPN
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
+How one 16 GB desktop-class box ran a full self-hosted stack, four lab VMs, and a VPN
 gateway — without the layers stepping on each other.
 
 ## The one rule: the host does nothing
@@ -9,7 +13,7 @@ The hypervisor runs virtualization and hardware health. Nothing else.
 
 | Layer | Machine | Responsibility |
 |---|---|---|
-| Hypervisor | `pve` (bare metal) | QEMU/KVM, vzdump backups (target failed 2026-07-17, not yet replaced), SMART monitoring, notifications |
+| Hypervisor | `pve` (bare metal) | QEMU/KVM, vzdump backups (target failed 2026-07-17, never replaced), SMART monitoring, notifications |
 | Workload | VM 100 (Ubuntu 24.04) | 44 Docker containers (2026-08-28) — the entire [homelab stack](https://github.com/MrTorriz/homelab) |
 | VPN edge | VM 105 (Alpine) | WireGuard gateway with fail-closed killswitch for the lab VMs |
 | Lab | VMs 101–104 | Windows 11, Kali, NixOS, Arch — on demand, never always-on |
@@ -25,7 +29,7 @@ that come back on their own afterwards (`onboot=1` — see [lessons](lessons.md#
 
 | Piece | What | Why |
 |---|---|---|
-| Notifications | A user-created Proxmox notification target `ntfy` (type **webhook**) posting to the ntfy server in VM 100; the single `default-matcher` routes everything to it. The token is a Proxmox secret in `/etc/pve/priv/notifications.cfg`. The stock `mail-to-root` target still exists but has been dead since 2026-07-17. | A failed job must reach a phone, not a mailbox nobody reads ([lesson #15](lessons.md#15-nofail--is_mountpoint-hide-a-dead-backup-target--alert-on-missing-successes-not-just-failures)). Every failed vzdump since logs `notified via target ntfy`. |
+| Notifications | A user-created Proxmox notification target `ntfy` (type **webhook**) posting to the ntfy server in VM 100; the single `default-matcher` routes everything to it. The token is a Proxmox secret in `/etc/pve/priv/notifications.cfg`. The stock `mail-to-root` target still existed but had been dead since 2026-07-17. | A failed job must reach a phone, not a mailbox nobody reads ([lesson #15](lessons.md#15-nofail--is_mountpoint-hide-a-dead-backup-target--alert-on-missing-successes-not-just-failures)). Every failed vzdump after that logged `notified via target ntfy`. |
 | `pve-healthcheck.timer` | Every 5 minutes: are the always-on VMs running, is every storage active → ntfy on deviation. | Alert on *missing successes*, not only on failures — the dead backup target was silent for eight days. |
 | IPv6 off | `/etc/sysctl.d/99-disable-ipv6.conf` (`all` + `default` disabled) since 2026-06-26; zero global v6 addresses on the host. | The ISP provides no routable v6; a half-configured v6 stack is a leak vector, not a feature. |
 | `unattended-upgrades` | On, origins limited to Debian security; the Proxmox repository is excluded; no automatic reboot. | Security patches land on their own. PVE upgrades and reboots stay a deliberate act — a host reboot is what took the backup disk with it. |
@@ -65,7 +69,7 @@ needs a reason.
 |---|---|---|
 | NVMe SSD | 480 GB | Proxmox root + `local-lvm` thin pool (all VM boot disks) |
 | 2 × WD Red Plus (CMR) | 4 TB each | **Raw passthrough to VM 100** — media + backup data, untouched by the hypervisor |
-| SATA HDD | 1 TB | Dedicated `vzdump` target (weekly VM images, `keep-last=3`) — **failed 2026-07-17, not yet replaced** ([backup](backup.md#tier-2--vm-images-vzdump-local-scheduled)) |
+| SATA HDD | 1 TB | Dedicated `vzdump` target (weekly VM images, `keep-last=3`) — **failed 2026-07-17, never replaced** ([backup](backup.md#tier-2--vm-images-vzdump-local-scheduled)) |
 
 The two 4 TB drives are handed to VM 100 as whole-disk passthrough (`scsi1`/`scsi2`,
 `backup=0`). The hypervisor never mounts, formats, or backs them up — they carry the same
@@ -116,8 +120,8 @@ Full recipe and gotchas: [passthrough.md](passthrough.md).
 
 ## Power
 
-Not re-measured since 2026-07-03. The last figures — ~17 W CPU package, ~15–18 W GPU at
+Never re-measured after 2026-07-03. The last figures — ~17 W CPU package, ~15–18 W GPU at
 idle, ~35 W as the working total — came from Scaphandre on the host (RAPL isn't available
 inside a VM, so power metering is one of the few things that *must* live on the
-hypervisor). Scaphandre was removed from the host on 2026-07-04; until a meter is back
-these numbers are history, not status ([metrics](metrics.md)).
+hypervisor). Scaphandre was removed from the host on 2026-07-04 and no meter replaced it
+before the host was retired; these numbers are history, not status ([metrics](metrics.md)).

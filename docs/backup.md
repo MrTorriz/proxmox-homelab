@@ -1,5 +1,9 @@
 # Backup strategy
 
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
 Two independent tiers. Mixing them up is how you end up with backups that restore the
 wrong thing — or nothing.
 
@@ -28,8 +32,8 @@ documents) is what tier 1 covers.
 > failed every Sunday since 2026-07-19 with `could not activate storage 'vzbackup'` —
 > the first failure notified a dead `mail-to-root`, every one since 2026-07-26 went
 > through ntfy. The last good images were on the dead disk. The only
-> VM image on the host today is an emergency dump of VM 105 (77 MB, on `local`,
-> 2026-07-25). **No image of VM 100 or 101 exists.**
+> VM image on the host at that point was an emergency dump of VM 105 (77 MB, on `local`,
+> 2026-07-25). **No image of VM 100 or 101 existed.**
 >
 > Tier 1 is unaffected: the nightly appdata run on 2026-08-28 completed (21 GB; offsite
 > push finished 06:40 UTC with 0 errors). How the failure stayed unnoticed for eight days
@@ -52,7 +56,7 @@ Details that matter:
 
 - **`is_mountpoint=1` on the storage.** If the backup disk is absent, Proxmox refuses to
   write instead of silently filling the NVMe root with images. This is exactly what it
-  did on 2026-07-19 and every Sunday since: a failed job and a notification, not a full
+  did on 2026-07-19 and every Sunday after that: a failed job and a notification, not a full
   root filesystem.
 - **Passthrough disks are `backup=0`**, so images stay tens of GB instead of impossible
   (8 TB of raw disk).
@@ -68,9 +72,10 @@ Details that matter:
 the same thin pool as the VM disk; it is a short-term undo button, not a backup. Take it
 anyway — and treat it as exactly that.
 
-**While tier 2 is offline, risky work waits.** Anything that would need an image restore
+**While tier 2 was offline, risky work waited.** Anything that would need an image restore
 to back out of (a major upgrade of the workload VM, storage or passthrough changes,
-a host upgrade) is postponed until `vzbackup` is back and a fresh image of VM 100 exists.
+a host upgrade) was postponed until `vzbackup` was back and a fresh image of VM 100 existed.
+Tier 2 never came back before the host was retired.
 
 ## Manual image before risky work
 
