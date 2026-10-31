@@ -1,5 +1,9 @@
 # Decisions — why this, and not that
 
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
 The alternatives were real and the trade-offs were paid. Written down so the next
 rebuild doesn't re-litigate them from scratch.
 
@@ -78,10 +82,19 @@ Because they answer different questions: tier 1 (encrypted offsite appdata) answ
 mistake". Mixing them up produces backups that restore the wrong thing
 ([backup](backup.md)). Losing tier 2 on 2026-07-17 (the backup disk died) didn't change
 the answer — tier 1 still restores the system — it only removed the convenience of a
-30-minute rollback until the disk is replaced.
+30-minute rollback. The disk was never replaced.
 
 ## Why cloud-init for VM builds
 
 A rebuild should be a runbook, not an adventure. Cloud-init pins the parts that are
 easy to get subtly wrong by hand — UID/GID 1000 (container volume permissions depend
 on it), SSH key, static IP ([migration](migration.md#rebuild-highlights)).
+
+## Why the hypervisor went again
+
+On 2026-09-13 the layer was removed. In practice it hosted one production VM: the lab
+VMs were barely used and the gateway carried little more than keepalives. Against that
+stood a 10 GB cap on the workload in a 16 GB box, GPU and disk passthrough to maintain,
+and a second OS to patch and audit. The workload VM's system disk was written back to
+the physical SSD; the full reasoning is in
+[MrTorriz/homelab](https://github.com/MrTorriz/homelab/blob/main/docs/decisions.md#platform-bare-metal-after-a-hypervisor-detour).

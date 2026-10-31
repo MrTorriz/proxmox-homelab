@@ -1,7 +1,11 @@
 # The VPN gateway VM
 
-A 512 MB Alpine Linux router (VM 105, `vpn-gw`) that puts every lab VM behind Mullvad
-WireGuard with a fail-closed killswitch. One Mullvad device slot serves an unlimited
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
+A 512 MB Alpine Linux router (VM 105, `vpn-gw`) that put every lab VM behind Mullvad
+WireGuard with a fail-closed killswitch. One Mullvad device slot served an unlimited
 number of VMs behind it.
 
 ## Why a gateway VM instead of a client per VM

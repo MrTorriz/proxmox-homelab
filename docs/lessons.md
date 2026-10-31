@@ -1,5 +1,9 @@
 # Operational lessons
 
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
 Fifteen things this setup taught the hard way. Numbered because the other docs
 cross-reference them.
 
@@ -106,8 +110,8 @@ was a backup tier that had been dead for eight days before anyone knew. The fail
 notification went to `mail-to-root`, which had stopped delivering the same day: a
 postfix hardening pass on the workload VM. The job failed, Proxmox dutifully notified a
 target that led nowhere, and the gap was found by a manual health check a week and a
-missed run later. Fixes: notifications now go through a webhook to ntfy (a target that
+missed run later. Fixes: from then on notifications went through a webhook to ntfy (a target that
 is checked end-to-end, not assumed), plus a five-minute host healthcheck timer that
-posts on missing VMs and inactive storage. The lesson is two rules: a backup that has
+posted on missing VMs and inactive storage. The lesson is two rules: a backup that has
 not reported *success* by its deadline is an alarm, not an absence of news — and never
 route alarms through a component you are hardening on the same day.

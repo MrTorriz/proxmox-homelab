@@ -1,6 +1,10 @@
 # The VM fleet
 
-Six VMs on one 6-core / 16 GB host. Two always-on, four on demand — because RAM is the
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
+Six VMs on one 6-core / 16 GB host. Two always-on, four on demand — because RAM was the
 bottleneck, not CPU ([budget](architecture.md#ram-the-actual-bottleneck)).
 
 ## Inventory

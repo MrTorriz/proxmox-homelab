@@ -1,5 +1,8 @@
 # The migration: bare metal → hypervisor, same box, nothing copied
 
+> **Historical.** This move was reversed on 2026-09-13, when the Proxmox host was retired
+> and the same Ubuntu installation went back onto bare metal ([README](../README.md)).
+
 The [homelab](https://github.com/MrTorriz/homelab) ran on bare-metal Ubuntu 24.04. This
 is how the same physical machine became a Proxmox host with that server living on as
 VM 100 — same IP, same data, one afternoon of downtime.

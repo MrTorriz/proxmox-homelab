@@ -1,6 +1,10 @@
 # Passthrough: GPU and raw disks
 
-VM 100 gets real hardware: an RTX 2060 for transcoding/ML and two 4 TB drives with data
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
+VM 100 got real hardware: an RTX 2060 for transcoding/ML and two 4 TB drives with data
 that predates the hypervisor. Both passthroughs, both sets of gotchas.
 
 ## GPU — RTX 2060 → VM 100 (vfio)

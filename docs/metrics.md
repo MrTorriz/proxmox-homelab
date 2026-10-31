@@ -1,7 +1,11 @@
 # Metrics — the numbers, with receipts
 
+> **Historical.** The Proxmox host described here was retired on 2026-09-13; present tense
+> refers to its last verified state (2026-08-28). Why it went and where the stack runs now:
+> [README](../README.md).
+
 Every figure has a command; the column says whether it was re-run. The table was
-refreshed on 2026-08-28 from the live host. Rows marked ✘ still carry the value from the
+refreshed on 2026-08-28 from the host, the last full pass before it was retired. Rows marked ✘ still carry the value from the
 previous pass (2026-07-03) and say why.
 
 ## Measured 2026-08-28
@@ -25,6 +29,6 @@ Two honesty notes:
 
 - **Container count drifts.** Services get added and pruned; the docs carry the dated
   count, not a rounded one. Re-run the command, don't trust a README.
-- **Power is history until a meter is back.** The 2026-07-03 figures were idle-workload
+- **Power stayed history.** The 2026-07-03 figures were idle-workload
   (transcodes and ML jobs spike the GPU well past its idle draw). The exporter left the
-  host the next day, so nothing has been measured since.
+  host the next day, and nothing was measured again before the host was retired.
