@@ -2,8 +2,9 @@
 
 # Proxmox Homelab
 
-**The homelab, virtualized — sanitized reference of a real Proxmox VE host: six VMs, GPU + disk passthrough, fail-closed VPN gateway.**
+**The homelab, virtualized — sanitized record of the Proxmox VE host that ran it from June to September 2026: six VMs, GPU + disk passthrough, fail-closed VPN gateway.**
 
+[![Status: retired](https://img.shields.io/badge/status-retired_2026--09--13-lightgrey?style=flat-square)](https://github.com/MrTorriz/homelab)
 [![CI](https://img.shields.io/github/actions/workflow/status/MrTorriz/proxmox-homelab/lint.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=CI)](https://github.com/MrTorriz/proxmox-homelab/actions/workflows/lint.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/MrTorriz/proxmox-homelab?style=flat-square&logo=git&logoColor=white)](https://github.com/MrTorriz/proxmox-homelab/commits/main)
@@ -18,17 +19,25 @@
 
 </div>
 
+> **Retired on 2026-09-13.** This Proxmox host no longer exists. The hypervisor ended up
+> hosting one production VM — the lab VMs were barely used and the gateway VM carried
+> little more than keepalives — while the workload VM sat under a 10 GB cap on a 16 GB
+> box, with GPU and disk passthrough to maintain for it. The VM's system disk was written
+> back to the physical SSD, and the same Ubuntu installation now runs on bare metal:
+> **[MrTorriz/homelab](https://github.com/MrTorriz/homelab)** ([why the hypervisor went](https://github.com/MrTorriz/homelab/blob/main/docs/decisions.md#platform-bare-metal-after-a-hypervisor-detour)).
+> Everything below is the record of June–September 2026 and is no longer updated.
+
 ---
 
-> **What this is.** A sanitized public reference of a real, running Proxmox host. The live configuration is the source of truth and lives in a private repository; this repo mirrors it with hostnames, domains and identifiers replaced. It is not drop-in reproducible.
+> **What this is.** A sanitized public reference of a real Proxmox host, as it ran until 2026-09-13. Its configuration was kept in a private repository; this repo mirrored it with hostnames, domains and identifiers replaced. It is not drop-in reproducible.
 >
 > **Sanitization policy.** RFC1918 addressing (`192.168.1.0/24`, `10.10.10.0/24`) and the network topology are published deliberately — they are unreachable from outside and carry no identity. Hostnames, domains, MAC addresses, disk serials/WWNs, account and device identifiers, e-mail addresses and the ISP's name are replaced or removed.
 
 ## TL;DR
 
 - **One 16 GB desktop box, six VMs** — a hard RAM budget, not wishful overcommit ([architecture](docs/architecture.md)).
-- **The old bare-metal server lives on as VM 100** — same IP, same data, restored from a ~28 GB encrypted offsite backup; the media drives — 6+ TB of data — were passed through raw and never copied ([migration](docs/migration.md)).
-- **Every lab VM is born behind a VPN** — a 512 MB Alpine gateway VM tunnels an isolated bridge through Mullvad WireGuard, killswitch enforced by `FORWARD DROP`, not by a watchdog ([vpn-gateway](docs/vpn-gateway.md)).
+- **The old bare-metal server lived on as VM 100** — same IP, same data, restored from a ~28 GB encrypted offsite backup; the media drives — 6+ TB of data — were passed through raw and never copied ([migration](docs/migration.md)).
+- **Every lab VM was born behind a VPN** — a 512 MB Alpine gateway VM tunneled an isolated bridge through Mullvad WireGuard, killswitch enforced by `FORWARD DROP`, not by a watchdog ([vpn-gateway](docs/vpn-gateway.md)).
 - **Real hardware in the guest** — RTX 2060 via vfio for NVENC/ML, two 4 TB drives as whole-disk passthrough ([passthrough](docs/passthrough.md)).
 - **Fifteen operational lessons** written down so they only cost once ([lessons](docs/lessons.md)).
 
@@ -40,10 +49,11 @@
 
 ## The story
 
-This is the virtualization layer under [MrTorriz/homelab](https://github.com/MrTorriz/homelab).
-That repo documents the Docker stack (44 containers as of 2026-08-28) that used to run on
-bare-metal Ubuntu. One weekend the machine was wiped and reborn as a Proxmox host — and
-the server it used to be came back as a VM on top of itself:
+This was the virtualization layer under [MrTorriz/homelab](https://github.com/MrTorriz/homelab).
+That repo documents the Docker stack (44 containers as of 2026-08-28), which ran on
+bare-metal Ubuntu before and after this period. One weekend in June 2026 the machine was
+wiped and reborn as a Proxmox host — and the server it used to be came back as a VM on
+top of itself:
 
 1. Pack what the SSD held that mattered (appdata, configs, secrets) into three tar
    archives → encrypted offsite storage. Audit three times for what the backup *misses* —
@@ -53,12 +63,13 @@ the server it used to be came back as a VM on top of itself:
    same evening.
 4. Hand the data drives and the GPU to the VM — raw passthrough, nothing copied.
 
-Since then the host has grown a VPN gateway VM and four on-demand lab VMs. Full write-up:
-[docs/migration.md](docs/migration.md).
+After that the host grew a VPN gateway VM and four on-demand lab VMs. Full write-up:
+[docs/migration.md](docs/migration.md). On 2026-09-13 the move was reversed: the VM's
+system disk went back onto the physical SSD, and the hypervisor was removed.
 
 ---
 
-## Verified snapshot — 2026-08-28
+## Last verified snapshot — 2026-08-28
 
 | | | Source |
 |---|---|---|
@@ -69,7 +80,7 @@ Since then the host has grown a VPN gateway VM and four on-demand lab VMs. Full 
 | Storage | local 30.6 % · local-lvm 30.1 % · vzbackup inactive since 2026-07-17 | `pvesm status` |
 | Power | not re-measured since 2026-07-03 (Scaphandre removed 2026-07-04) | — |
 
-<sub>Read from the live host on the date above; nothing here updates automatically. What was and was not re-measured: <a href="docs/metrics.md">docs/metrics.md</a>.</sub>
+<sub>Read from the host on the date above, the last full pass before it was retired. What was and was not re-measured: <a href="docs/metrics.md">docs/metrics.md</a>.</sub>
 
 ---
 
@@ -84,8 +95,8 @@ Since then the host has grown a VPN gateway VM and four on-demand lab VMs. Full 
 | 104 | arch | Arch Linux | 4 GB | | Rolling playground, behind the VPN |
 | 105 | vpn-gw | Alpine | 512 MB | ✅ | Mullvad WireGuard gateway, fail-closed |
 
-Lab VMs run one at a time — RAM is the bottleneck and the budget says so
-([docs/vms.md](docs/vms.md)). What runs inside VM 100:
+Lab VMs ran one at a time — RAM was the bottleneck and the budget said so
+([docs/vms.md](docs/vms.md)). What ran inside VM 100, and now runs on bare metal:
 [MrTorriz/homelab](https://github.com/MrTorriz/homelab).
 
 ---
@@ -107,19 +118,19 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 ## Design principles
 
 1. **The host does nothing.** Virtualization and hardware health only. No Docker, no DNS,
-   no apps on the hypervisor. Host maintenance still takes the whole lab down — every guest
-   stops with the host — but a minimal host needs those windows rarely, and `onboot=1`
-   brings everything back without a hand on the console. The short list of exceptions is in [architecture](docs/architecture.md#what-the-host-does-run).
-2. **No unencrypted egress.** The workload VM runs its own VPN client in lockdown mode;
-   everything else sits on a bridge whose only exit is a WireGuard tunnel. Tunnel down =
+   no apps on the hypervisor. Host maintenance still took the whole lab down — every guest
+   stopped with the host — but a minimal host needed those windows rarely, and `onboot=1`
+   brought everything back without a hand on the console. The short list of exceptions is in [architecture](docs/architecture.md#what-the-host-does-run).
+2. **No unencrypted egress.** The workload VM ran its own VPN client in lockdown mode;
+   everything else sat on a bridge whose only exit was a WireGuard tunnel. Tunnel down =
    traffic dropped, not leaked.
-3. **Ingress is an outbound tunnel.** External access rides a Cloudflare Tunnel from the
-   workload VM. Outbound Cloudflare Tunnel is the intended ingress path; the router port-forward table was not re-verified on 2026-08-28.
+3. **Ingress is an outbound tunnel.** External access rode a Cloudflare Tunnel from the
+   workload VM. Outbound Cloudflare Tunnel was the intended ingress path; the router port-forward table was not re-verified on 2026-08-28.
 4. **Caps, not measurements.** Thin disks and RAM ceilings are promises the guests will
    grow into. Budget them like they're real, because they become real
    ([lesson #14](docs/lessons.md#14-ballooning-does-not-return-host-ram-on-a-running-vm)).
 5. **Passthrough + protect, not pool + hope.** Single host, irreplaceable data: the
-   hypervisor never touches the data drives ([docs/architecture.md](docs/architecture.md#storage-three-tiers-one-hard-line)).
+   hypervisor never touched the data drives ([docs/architecture.md](docs/architecture.md#storage-three-tiers-one-hard-line)).
 
 ---
 
@@ -132,7 +143,7 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 │   ├── migration.md       # Bare metal → VM: backup, audits, wipe, restore
 │   ├── vpn-gateway.md     # The Alpine WireGuard gateway VM, killswitch design
 │   ├── passthrough.md     # GPU (vfio) + whole-disk passthrough, gotchas
-│   ├── backup.md          # Two-tier strategy (tier 2 offline since 2026-07)
+│   ├── backup.md          # Two-tier strategy (tier 2 lost 2026-07-17)
 │   ├── vms.md             # Fleet, new-VM recipe, guest-agent tricks
 │   ├── decisions.md       # Why this and not that — the alternatives were real
 │   ├── runbook.md         # What to do when each layer breaks
@@ -147,7 +158,7 @@ Lab VMs run one at a time — RAM is the bottleneck and the budget says so
 
 ## Documentation
 
-- [`docs/architecture.md`](docs/architecture.md) — how one box carries all of it without the layers colliding
+- [`docs/architecture.md`](docs/architecture.md) — how one box carried all of it without the layers colliding
 - [`docs/migration.md`](docs/migration.md) — the bare-metal → VM move, including the three completeness audits
 - [`docs/vpn-gateway.md`](docs/vpn-gateway.md) — one Mullvad slot, unlimited VMs, fail-closed by construction
 - [`docs/passthrough.md`](docs/passthrough.md) — vfio GPU + raw disks, and every gotcha they charged for
